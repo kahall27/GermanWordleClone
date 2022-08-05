@@ -100,22 +100,28 @@ def main():
                 pos = pygame.mouse.get_pos()
                 if pos[1] >= 600 and pos[1] <= 640:
                     for letter in row_one:
-                        if (pygame.Rect(letter_locations[letter][0], letter_locations[letter][1], 30, 40).collidepoint(pos[0], pos[1])):
+                        if pygame.Rect(letter_locations[letter][0], letter_locations[letter][1], 30, 40).collidepoint(pos[0], pos[1]):
                             if len(current_word) < 5:
                                 current_word += letter
                                 letter_colors[letter] = WHITE
                 elif pos[1] >= 660 and pos[1] <= 700:
                     for letter in row_two:
-                        if (pygame.Rect(letter_locations[letter][0], letter_locations[letter][1], 30, 40).collidepoint(pos[0], pos[1])):
+                        if pygame.Rect(letter_locations[letter][0], letter_locations[letter][1], 30, 40).collidepoint(pos[0], pos[1]):
                             if len(current_word) < 5:
                                 current_word += letter
                                 letter_colors[letter] = WHITE
                 elif pos[1] >= 720 and pos[1] <= 760:
-                    for letter in row_three:
-                        if (pygame.Rect(letter_locations[letter][0], letter_locations[letter][1], 30, 40).collidepoint(pos[0], pos[1])):
-                            if len(current_word) < 5:        
-                                current_word += letter
-                                letter_colors[letter] = WHITE
+                    if (pygame.Rect(letter_locations["backspace"][0], letter_locations["backspace"][1], 75, 40).collidepoint(pos[0], pos[1])) and current_word:
+                        removed_letter = current_word[-1]
+                        current_word = current_word[:-1]
+                        if current_word.count(removed_letter) == 0:
+                            letter_colors[removed_letter] = GRAY
+                    else:
+                        for letter in row_three:
+                            if pygame.Rect(letter_locations[letter][0], letter_locations[letter][1], 30, 40).collidepoint(pos[0], pos[1]):
+                                if len(current_word) < 5:        
+                                    current_word += letter
+                                    letter_colors[letter] = WHITE
             # if event.type == pygame.KEYDOWN:
 
         
