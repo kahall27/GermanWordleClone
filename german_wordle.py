@@ -7,6 +7,7 @@ GRAY = (100, 100, 100)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 YELLOW = (255, 255, 0)
+BLACK = (0, 0, 0)
 
 row_one = ["Q", "W", "E", "R", "T", "Z", "U", "I", "O", "P", "Ü"]
 row_two = ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ö", "Ä"]
@@ -93,12 +94,34 @@ def draw_keyboard(screen):
     textRect.center = (from_left + 45 + 37.5, from_top + 20)
     screen.blit(text, textRect)
     
-def check_word(word_to_guess, current_guess, current_guess_idx, box_colors):
+def check_word(word_to_guess, current_guess, current_guess_idx, box_colors, keyboard_colors):
     for i in range(5):
         if word_to_guess[i] == current_guess.lower()[i]:
             box_colors[current_guess_idx][i] = GREEN
+            keyboard_colors[current_guess[i]] = GREEN
         elif current_guess.lower()[i] in word_to_guess:
             box_colors[current_guess_idx][i] = YELLOW
+            keyboard_colors[current_guess[i]] = YELLOW
+        else:
+            keyboard_colors[current_guess[i]] = BLACK
+
+def end_of_game(screen, win, word):
+    pygame.draw.rect(screen, WHITE, pygame.Rect(50, 50, WINDOW_WIDTH - 100, 300), border_radius=3)
+    
+    font = pygame.font.Font('freesansbold.ttf', 30)
+    if win:
+        text = font.render("Congrats, you win!", True, (0, 0, 0))
+    else:
+        text = font.render("Sorry, you lose!", True, (0, 0, 0))
+
+    textRect = text.get_rect()
+    textRect.center = (WINDOW_WIDTH // 2, 350 // 2)
+    screen.blit(text, textRect)
+
+    text2 = font.render("The correct word is " + word + "!", True, (0, 0, 0))
+    textRect2 = text.get_rect()
+    textRect2.center = (WINDOW_WIDTH // 2 - 40, 350 // 2 + 40)
+    screen.blit(text2, textRect2)
 
 def main():
     # Initialize screen
@@ -116,6 +139,8 @@ def main():
     current_guess_idx = 0
 
     word_to_guess = "hello"
+    game_on = True
+    win = False
     # Event loop
     while True:
 
@@ -145,7 +170,12 @@ def main():
                         if current_word.count(removed_letter) == 0:
                             letter_colors[removed_letter] = GRAY
                     elif (pygame.Rect(letter_locations["enter"][0], letter_locations["enter"][1], 75, 40).collidepoint(pos[0], pos[1])) and (len(current_word) == 5):
-                        check_word(word_to_guess, current_word, current_guess_idx, box_colors)
+                        check_word(word_to_guess, current_word, current_guess_idx, box_colors, letter_colors)
+                        if current_word.lower() == word_to_guess:
+                            win = True
+                            game_on = False
+                        elif current_guess_idx == 5:
+                            game_on = False
                         current_word = ""
                         current_guess_idx += 1
                     else:
@@ -163,13 +193,16 @@ def main():
         else:
             list_of_guesses[current_guess_idx] = current_word
                 
-
-        screen.fill(BACKGROUND)
-        draw_boxes(screen, box_colors)
-        if len(list_of_guesses) > 1:
-            draw_past_guesses(screen, list_of_guesses)
-        draw_current_word(screen, current_word, current_guess_idx)
-        draw_keyboard(screen)
+        if game_on:
+            screen.fill(BACKGROUND)
+            draw_boxes(screen, box_colors)
+            if len(list_of_guesses) > 1:
+                draw_past_guesses(screen, list_of_guesses)
+            draw_current_word(screen, current_word, current_guess_idx)
+            draw_keyboard(screen)
+        else:
+           end_of_game(screen, win, word_to_guess) 
         pygame.display.update()
+
 
 if __name__ == '__main__': main()
