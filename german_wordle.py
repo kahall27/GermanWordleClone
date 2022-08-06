@@ -5,6 +5,8 @@ WINDOW_HEIGHT, WINDOW_WIDTH = 800, 500
 BACKGROUND = (144, 238, 144)
 GRAY = (100, 100, 100)
 WHITE = (255, 255, 255)
+GREEN = (0, 255, 0)
+YELLOW = (255, 255, 0)
 
 row_one = ["Q", "W", "E", "R", "T", "Z", "U", "I", "O", "P", "Ü"]
 row_two = ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ö", "Ä"]
@@ -18,13 +20,14 @@ letter_colors["backspace"] = GRAY
 letter_colors["enter"] = GRAY
 letter_locations = {letter: () for letter in row_one + row_two + row_three}
 
-def draw_boxes(screen):
+box_colors = {i:[GRAY for j in range(5)] for i in range(6)}
+def draw_boxes(screen, box_colors):
     
     for i in range(6):
         from_top = (i * 60) + ((i + 1) * 30)   # equal spacing between boxes
         for j in range(5):
             from_left = ((WINDOW_WIDTH - 300) / 6)* (j + 1) + (j * 60)  # equal spacing between boxes
-            pygame.draw.rect(screen, GRAY, pygame.Rect(from_left, from_top, 60, 60), border_radius=3)
+            pygame.draw.rect(screen, box_colors[i][j], pygame.Rect(from_left, from_top, 60, 60), border_radius=3)
 
 def draw_current_word(screen, current_word, current_guess_idx):
     font = pygame.font.Font('freesansbold.ttf', 32)
@@ -90,6 +93,12 @@ def draw_keyboard(screen):
     textRect.center = (from_left + 45 + 37.5, from_top + 20)
     screen.blit(text, textRect)
     
+def check_word(word_to_guess, current_guess, current_guess_idx, box_colors):
+    for i in range(5):
+        if word_to_guess[i] == current_guess.lower()[i]:
+            box_colors[current_guess_idx][i] = GREEN
+        elif current_guess.lower()[i] in word_to_guess:
+            box_colors[current_guess_idx][i] = YELLOW
 
 def main():
     # Initialize screen
@@ -105,6 +114,8 @@ def main():
 
     current_word = "" 
     current_guess_idx = 0
+
+    word_to_guess = "hello"
     # Event loop
     while True:
 
@@ -134,6 +145,7 @@ def main():
                         if current_word.count(removed_letter) == 0:
                             letter_colors[removed_letter] = GRAY
                     elif (pygame.Rect(letter_locations["enter"][0], letter_locations["enter"][1], 75, 40).collidepoint(pos[0], pos[1])) and (len(current_word) == 5):
+                        check_word(word_to_guess, current_word, current_guess_idx, box_colors)
                         current_word = ""
                         current_guess_idx += 1
                     else:
@@ -153,7 +165,7 @@ def main():
                 
 
         screen.fill(BACKGROUND)
-        draw_boxes(screen)
+        draw_boxes(screen, box_colors)
         if len(list_of_guesses) > 1:
             draw_past_guesses(screen, list_of_guesses)
         draw_current_word(screen, current_word, current_guess_idx)
