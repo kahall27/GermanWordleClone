@@ -8,6 +8,7 @@ WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 YELLOW = (255, 255, 0)
 BLACK = (0, 0, 0)
+RED = (255, 0, 0)
 
 row_one = ["Q", "W", "E", "R", "T", "Z", "U", "I", "O", "P", "Ü"]
 row_two = ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ö", "Ä"]
@@ -36,10 +37,7 @@ def draw_current_word(screen, current_word, current_guess_idx):
     for i in range(len(current_word)):
         from_left = ((WINDOW_WIDTH - 300) / 6) * (i + 1) + (i * 60)
     
-        text = font.render(current_word[i], True, (0, 0, 0))
-        textRect = text.get_rect()
-        textRect.center = (from_left + 30, from_top + 30)
-        screen.blit(text, textRect)
+        write_text(screen, current_word[i], 32, from_left + 30, from_top + 30)
 
 def draw_past_guesses(screen, list_of_guesses):
     font = pygame.font.Font('freesansbold.ttf', 32)
@@ -48,10 +46,7 @@ def draw_past_guesses(screen, list_of_guesses):
         for j in range(5):
             from_left = ((WINDOW_WIDTH - 300) / 6) * (j + 1) + (j * 60)
     
-            text = font.render(list_of_guesses[i][j], True, (0, 0, 0))
-            textRect = text.get_rect()
-            textRect.center = (from_left + 30, from_top + 30)
-            screen.blit(text, textRect)
+            write_text(screen, list_of_guesses[i][j], 32, from_left + 30, from_top + 30)
 
 def draw_keyboard(screen):
 
@@ -71,28 +66,20 @@ def draw_keyboard(screen):
             pygame.draw.rect(screen, letter_colors[row[i]], pygame.Rect(from_left, from_top, 30, 40), border_radius=3)
             letter_locations[row[i]] = (from_left, from_top)
 
-            text = font.render(row[i], True, (0, 0, 0))
-            textRect = text.get_rect()
-            textRect.center = (from_left + 15, from_top + 20)
-            screen.blit(text, textRect)
+            write_text(screen, row[i], 26, from_left + 15, from_top + 20)
     
         row_idx += 1
     # enter
     font = pygame.font.Font('freesansbold.ttf', 20)
     pygame.draw.rect(screen, letter_colors["enter"], pygame.Rect((((WINDOW_WIDTH - len(row_one) * 30)) / (len(row_one) + 1)), from_top, 75, 40), border_radius=3)
     letter_locations["enter"] = ((((WINDOW_WIDTH - len(row_one) * 30)) / (len(row_one) + 1)), from_top)
-    text = font.render("ENTER", True, (0, 0, 0))
-    textRect = text.get_rect()
-    textRect.center = ((((WINDOW_WIDTH - len(row_one) * 30)) / (len(row_one) + 1)) + 37.5, from_top + 20)
-    screen.blit(text, textRect)
+    write_text(screen, "ENTER", 20, (((WINDOW_WIDTH - len(row_one) * 30)) / (len(row_one) + 1)) + 37.5, from_top + 20)
 
     # backspace
     pygame.draw.rect(screen, letter_colors["backspace"], pygame.Rect(from_left + 45, from_top, 75, 40), border_radius=3)
     letter_locations["backspace"] = (from_left + 45, from_top)
-    text = font.render("BACK", True, (0, 0, 0))
-    textRect = text.get_rect()
-    textRect.center = (from_left + 45 + 37.5, from_top + 20)
-    screen.blit(text, textRect)
+    write_text(screen, "BACK", 20, from_left + 45 + 37.5, from_top + 20)
+
     
 def check_word(word_to_guess, current_guess, current_guess_idx, box_colors, keyboard_colors):
     for i in range(5):
@@ -105,23 +92,34 @@ def check_word(word_to_guess, current_guess, current_guess_idx, box_colors, keyb
         else:
             keyboard_colors[current_guess[i]] = BLACK
 
+def write_text(screen, message, font_size, x_center, y_center):
+    font = pygame.font.Font('freesansbold.ttf', font_size)
+
+    text = font.render(message, True, (0, 0, 0))
+    textRect = text.get_rect()
+    textRect.center = (x_center, y_center)
+    screen.blit(text, textRect)
+
 def end_of_game(screen, win, word):
-    pygame.draw.rect(screen, WHITE, pygame.Rect(50, 50, WINDOW_WIDTH - 100, 300), border_radius=3)
+    message_width = WINDOW_WIDTH - 100
+    message_height = 300
+    pygame.draw.rect(screen, WHITE, pygame.Rect(50, 50, message_width, message_height), border_radius=3)
     
     font = pygame.font.Font('freesansbold.ttf', 30)
     if win:
-        text = font.render("Congrats, you win!", True, (0, 0, 0))
+        text = "Congrats, you win!"
     else:
-        text = font.render("Sorry, you lose!", True, (0, 0, 0))
+        text = "Sorry, you lose!"
 
-    textRect = text.get_rect()
-    textRect.center = (WINDOW_WIDTH // 2, 350 // 2)
-    screen.blit(text, textRect)
+    write_text(screen, text, 30, WINDOW_WIDTH // 2, 350 // 2)
+    write_text(screen, "The correct word is " + word + "!", 30, WINDOW_WIDTH // 2, 350 // 2 + 40)
 
-    text2 = font.render("The correct word is " + word + "!", True, (0, 0, 0))
-    textRect2 = text.get_rect()
-    textRect2.center = (WINDOW_WIDTH // 2 - 40, 350 // 2 + 40)
-    screen.blit(text2, textRect2)
+    block_width = message_width - 50 - (message_width // 2) - 10
+    pygame.draw.rect(screen, GREEN, pygame.Rect(50 + (message_width // 2) - block_width,  250, block_width, 50), border_radius=3)
+    pygame.draw.rect(screen, RED, pygame.Rect(50 + (message_width // 2) + 10, 250, block_width, 50), border_radius=3)
+
+    write_text(screen, "PLAY AGAIN!", 20, 50 + (message_width // 2) - (block_width / 2), 275)
+    write_text(screen, "END GAME!", 20, 50 + (message_width // 2) + (block_width // 2) + 10, 275)
 
 def main():
     # Initialize screen
