@@ -25,6 +25,15 @@ letter_colors["enter"] = GRAY
 letter_locations = {letter: () for letter in row_one + row_two + row_three}
 
 box_colors = {i:[GRAY for j in range(5)] for i in range(6)}
+
+def write_text(screen, message, font_size, x_center, y_center):
+    font = pygame.font.Font('freesansbold.ttf', font_size)
+
+    text = font.render(message, True, (0, 0, 0))
+    textRect = text.get_rect()
+    textRect.center = (x_center, y_center)
+    screen.blit(text, textRect)
+    
 def draw_boxes(screen, box_colors):
     
     for i in range(6):
@@ -93,14 +102,6 @@ def check_word(word_to_guess, current_guess, current_guess_idx, box_colors, keyb
             keyboard_colors[current_guess[i]] = YELLOW
         else:
             keyboard_colors[current_guess[i]] = BLACK
-
-def write_text(screen, message, font_size, x_center, y_center):
-    font = pygame.font.Font('freesansbold.ttf', font_size)
-
-    text = font.render(message, True, (0, 0, 0))
-    textRect = text.get_rect()
-    textRect.center = (x_center, y_center)
-    screen.blit(text, textRect)
 
 def end_of_game(screen, win, word):
     message_width = WINDOW_WIDTH - 100
@@ -187,6 +188,7 @@ def main():
                                 if len(current_word) < 5:        
                                     current_word += letter
                                     letter_colors[letter] = WHITE
+
                 elif game_over:
                     message_width = WINDOW_WIDTH - 100
                     block_width = message_width - 50 - (message_width // 2) - 10
