@@ -18,6 +18,7 @@ row_three = ["Y", "X", "C", "V", "B", "N", "M"]
 rows = [row_one, row_two, row_three]
 
 list_of_guesses = []
+
 # initially all letters are gray
 letter_colors = {letter: GRAY for letter in row_one + row_two + row_three}
 letter_colors["backspace"] = GRAY
@@ -33,7 +34,7 @@ def write_text(screen, message, font_size, x_center, y_center):
     textRect = text.get_rect()
     textRect.center = (x_center, y_center)
     screen.blit(text, textRect)
-    
+
 def draw_boxes(screen, box_colors):
     
     for i in range(6):
