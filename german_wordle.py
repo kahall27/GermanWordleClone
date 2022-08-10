@@ -1,3 +1,5 @@
+from ast import Pass
+from tkinter import FALSE
 import pygame
 from pygame.locals import *
 
@@ -120,7 +122,8 @@ def end_of_game(screen, win, word):
 
     write_text(screen, "PLAY AGAIN!", 20, 50 + (message_width // 2) - (block_width / 2), 275)
     write_text(screen, "END GAME!", 20, 50 + (message_width // 2) + (block_width // 2) + 10, 275)
-
+    
+        
 def main():
     # Initialize screen
     pygame.init()
@@ -138,10 +141,11 @@ def main():
 
     word_to_guess = "hello"
     game_on = True
+    game_over = False
     win = False
     # Event loop
-    while True:
-
+    while game_on:
+        pos = [0, 0]
         # clock.tick(75)
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -171,18 +175,39 @@ def main():
                         check_word(word_to_guess, current_word, current_guess_idx, box_colors, letter_colors)
                         if current_word.lower() == word_to_guess:
                             win = True
-                            game_on = False
+                            game_over = True
                         elif current_guess_idx == 5:
-                            game_on = False
-                        current_word = ""
-                        current_guess_idx += 1
+                            game_over = True
+                        else:
+                            current_word = ""
+                            current_guess_idx += 1
                     else:
                         for letter in row_three:
                             if pygame.Rect(letter_locations[letter][0], letter_locations[letter][1], 30, 40).collidepoint(pos[0], pos[1]):
                                 if len(current_word) < 5:        
                                     current_word += letter
                                     letter_colors[letter] = WHITE
-            # if event.type == pygame.KEYDOWN:
+                elif game_over:
+                    message_width = WINDOW_WIDTH - 100
+                    block_width = message_width - 50 - (message_width // 2) - 10
+                    if (pygame.Rect(50 + (message_width // 2) - block_width,  250, block_width, 50).collidepoint(pos[0], pos[1])):
+                        while current_guess_idx >= 0:
+                            for i in range(5):
+                                box_colors[current_guess_idx][i] = GRAY
+                            current_guess_idx -= 1
+                        current_guess_idx = 0
+
+                        for key in letter_colors.keys():
+                            letter_colors[key] = GRAY
+                        current_word = ""
+
+                        while len(list_of_guesses) > 0:
+                            list_of_guesses.pop()
+
+                        game_over = False
+
+                    elif (pygame.Rect(50 + (message_width // 2) + 10, 250, block_width, 50).collidepoint(pos[0], pos[1])):
+                        game_on = False
 
         
         
@@ -191,7 +216,7 @@ def main():
         else:
             list_of_guesses[current_guess_idx] = current_word
                 
-        if game_on:
+        if not game_over:
             screen.fill(BACKGROUND)
             draw_boxes(screen, box_colors)
             if len(list_of_guesses) > 1:
@@ -199,7 +224,8 @@ def main():
             draw_current_word(screen, current_word, current_guess_idx)
             draw_keyboard(screen)
         else:
-           end_of_game(screen, win, word_to_guess) 
+            end_of_game(screen, win, word_to_guess)
+
         pygame.display.update()
 
 
