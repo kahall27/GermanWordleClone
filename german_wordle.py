@@ -237,6 +237,9 @@ def main():
                         while len(list_of_guesses) > 0:
                             list_of_guesses.pop()
 
+                        letter_choice = choice(row_one + row_two + row_three)
+                        word_to_guess = choice(possible_words[letter_choice])   # new word to guess
+
                         game_over = False
 
                     elif (pygame.Rect(50 + (message_width // 2) + 10, 250, block_width, 50).collidepoint(pos[0], pos[1])):
