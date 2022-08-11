@@ -1,5 +1,4 @@
 # German Wordle Clone
-<br />
 <h2> About this Project </h2>
 This project is written in Python and uses the [pygame library](https://www.pygame.org/news) to create a user interface for the game. Additionally, I downloaded the raw text file from the [german-wordlist repository](https://github.com/enz/german-wordlist) for a list of German word that I then parsed to create a new text file of only five leader words. 
 <h2>How to Play</h2>

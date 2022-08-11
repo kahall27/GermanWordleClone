@@ -6,6 +6,7 @@ import pygame
 from pygame.locals import *
 from binary_search import binary_search
 from random import choice
+from deep_translator import GoogleTranslator
 
 WINDOW_HEIGHT, WINDOW_WIDTH = 800, 500
 BACKGROUND = (144, 238, 144)
@@ -135,8 +136,11 @@ def end_of_game(screen, win, word):
     else:
         text = "Sorry, you lose!"
 
-    write_text(screen, text, 30, WINDOW_WIDTH // 2, 350 // 2)
-    write_text(screen, "The correct word is " + word + "!", 30, WINDOW_WIDTH // 2, 350 // 2 + 40)
+    write_text(screen, text, 26, WINDOW_WIDTH // 2, 350 // 2 - 40)
+    write_text(screen, "The correct word is " + word + "!", 26, WINDOW_WIDTH // 2, 350 // 2)
+
+    translation = GoogleTranslator(source="de", target="en").translate(word) 
+    write_text(screen, "It translates to " + translation + ".", 26, WINDOW_WIDTH // 2, 350 // 2 + 40)
 
     block_width = message_width - 50 - (message_width // 2) - 10
     pygame.draw.rect(screen, GREEN, pygame.Rect(50 + (message_width // 2) - block_width,  250, block_width, 50), border_radius=3)
