@@ -1,7 +1,11 @@
 from ast import Pass
+from calendar import c
+from operator import le
 from tkinter import FALSE
 import pygame
 from pygame.locals import *
+from binary_search import binary_search
+from random import choice
 
 WINDOW_HEIGHT, WINDOW_WIDTH = 800, 500
 BACKGROUND = (144, 238, 144)
@@ -11,6 +15,16 @@ GREEN = (0, 255, 0)
 YELLOW = (255, 255, 0)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
+
+possible_words = {}
+
+with open("five_letter_words.txt", "r") as word_file:
+    lines = word_file.readlines()
+    for line in lines:
+        if line[0].upper() in possible_words:
+            possible_words[line[0].upper()].append(line.strip().lower())
+        else:
+            possible_words[line[0].upper()] = [line.strip().lower()]
 
 row_one = ["Q", "W", "E", "R", "T", "Z", "U", "I", "O", "P", "Ü"]
 row_two = ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Ö", "Ä"]
@@ -94,15 +108,21 @@ def draw_keyboard(screen):
 
     
 def check_word(word_to_guess, current_guess, current_guess_idx, box_colors, keyboard_colors):
-    for i in range(5):
-        if word_to_guess[i] == current_guess.lower()[i]:
-            box_colors[current_guess_idx][i] = GREEN
-            keyboard_colors[current_guess[i]] = GREEN
-        elif current_guess.lower()[i] in word_to_guess:
-            box_colors[current_guess_idx][i] = YELLOW
-            keyboard_colors[current_guess[i]] = YELLOW
-        else:
-            keyboard_colors[current_guess[i]] = BLACK
+    if binary_search(possible_words[current_guess[0]], current_guess.lower()):
+        for i in range(5):
+            if word_to_guess[i] == current_guess.lower()[i]:
+                box_colors[current_guess_idx][i] = GREEN
+                keyboard_colors[current_guess[i]] = GREEN
+            elif current_guess.lower()[i] in word_to_guess:
+                box_colors[current_guess_idx][i] = YELLOW
+                keyboard_colors[current_guess[i]] = YELLOW
+            else:
+                keyboard_colors[current_guess[i]] = BLACK
+        return True
+    else:
+        for i in range(5):
+            box_colors[current_guess_idx][i] = RED
+        return False
 
 def end_of_game(screen, win, word):
     message_width = WINDOW_WIDTH - 100
@@ -141,7 +161,8 @@ def main():
     current_word = "" 
     current_guess_idx = 0
 
-    word_to_guess = "hello"
+    letter_choice = choice(row_one + row_two + row_three)
+    word_to_guess = choice(possible_words[letter_choice])
     game_on = True
     game_over = False
     win = False
@@ -172,17 +193,22 @@ def main():
                         removed_letter = current_word[-1]
                         current_word = current_word[:-1]
                         if current_word.count(removed_letter) == 0:
-                            letter_colors[removed_letter] = GRAY
+                            letter_colors[removed_letter] = GRAY # key goes from white to gray
+                        if (box_colors[current_guess_idx][0] == RED) and (len(current_word) < 5):
+                            for i in range(5):
+                                box_colors[current_guess_idx][i] = GRAY
+                        
                     elif (pygame.Rect(letter_locations["enter"][0], letter_locations["enter"][1], 75, 40).collidepoint(pos[0], pos[1])) and (len(current_word) == 5):
-                        check_word(word_to_guess, current_word, current_guess_idx, box_colors, letter_colors)
+                        valid_guess = check_word(word_to_guess, current_word, current_guess_idx, box_colors, letter_colors)
                         if current_word.lower() == word_to_guess:
                             win = True
                             game_over = True
                         elif current_guess_idx == 5:
                             game_over = True
                         else:
-                            current_word = ""
-                            current_guess_idx += 1
+                            if valid_guess:
+                                current_word = ""
+                                current_guess_idx += 1
                     else:
                         for letter in row_three:
                             if pygame.Rect(letter_locations[letter][0], letter_locations[letter][1], 30, 40).collidepoint(pos[0], pos[1]):
