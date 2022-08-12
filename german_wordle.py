@@ -170,7 +170,7 @@ def main():
     while translation == word_to_guess:
         word_to_guess = choice(possible_words[letter_choice])
         translation = GoogleTranslator(source="de", target="en").translate(word_to_guess) 
-
+    
     game_on = True
     game_over = False
     win = False
