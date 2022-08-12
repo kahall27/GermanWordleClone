@@ -19,6 +19,6 @@ def binary_search(my_list, target):
 
 
 if __name__ == "__main__":
-    test_list = ["aa", "bb", "cc", "dd", "ee", "ff"]
+    test_list = ["aa", "bb", "cc", "dd", "ee"]
     print(binary_search(test_list, "aa")) # should print True
     print(binary_search(test_list, "ff")) # should print False
