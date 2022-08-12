@@ -125,7 +125,7 @@ def check_word(word_to_guess, current_guess, current_guess_idx, box_colors, keyb
             box_colors[current_guess_idx][i] = RED
         return False
 
-def end_of_game(screen, win, word):
+def end_of_game(screen, win, word, translation):
     message_width = WINDOW_WIDTH - 100
     message_height = 300
     pygame.draw.rect(screen, WHITE, pygame.Rect(50, 50, message_width, message_height), border_radius=3)
@@ -138,8 +138,6 @@ def end_of_game(screen, win, word):
 
     write_text(screen, text, 26, WINDOW_WIDTH // 2, 350 // 2 - 40)
     write_text(screen, "The correct word is " + word + "!", 26, WINDOW_WIDTH // 2, 350 // 2)
-
-    translation = GoogleTranslator(source="de", target="en").translate(word) 
     write_text(screen, "It translates to " + translation + ".", 26, WINDOW_WIDTH // 2, 350 // 2 + 40)
 
     block_width = message_width - 50 - (message_width // 2) - 10
@@ -167,6 +165,12 @@ def main():
 
     letter_choice = choice(row_one + row_two + row_three)
     word_to_guess = choice(possible_words[letter_choice])
+    translation = GoogleTranslator(source="de", target="en").translate(word_to_guess) 
+
+    while translation == word_to_guess:
+        word_to_guess = choice(possible_words[letter_choice])
+        translation = GoogleTranslator(source="de", target="en").translate(word_to_guess) 
+
     game_on = True
     game_over = False
     win = False
@@ -240,6 +244,10 @@ def main():
                         letter_choice = choice(row_one + row_two + row_three)
                         word_to_guess = choice(possible_words[letter_choice])   # new word to guess
 
+                        while translation == word_to_guess:
+                            word_to_guess = choice(possible_words[letter_choice])
+                            translation = GoogleTranslator(source="de", target="en").translate(word_to_guess) 
+
                         game_over = False
 
                     elif (pygame.Rect(50 + (message_width // 2) + 10, 250, block_width, 50).collidepoint(pos[0], pos[1])):
@@ -260,7 +268,7 @@ def main():
             draw_current_word(screen, current_word, current_guess_idx)
             draw_keyboard(screen)
         else:
-            end_of_game(screen, win, word_to_guess)
+            end_of_game(screen, win, word_to_guess, translation)
 
         pygame.display.update()
 
