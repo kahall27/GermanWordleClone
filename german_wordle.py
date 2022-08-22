@@ -33,6 +33,7 @@ row_three = ["Y", "X", "C", "V", "B", "N", "M"]
 rows = [row_one, row_two, row_three]
 
 list_of_guesses = []
+wrong_letters = set()
 
 # initially all letters are gray
 letter_colors = {letter: GRAY for letter in row_one + row_two + row_three}
@@ -118,6 +119,7 @@ def check_word(word_to_guess, current_guess, current_guess_idx, box_colors, keyb
                 box_colors[current_guess_idx][i] = YELLOW
                 keyboard_colors[current_guess[i]] = YELLOW
             else:
+                wrong_letters.add(current_guess[i])
                 keyboard_colors[current_guess[i]] = BLACK
         return True
     else:
@@ -201,7 +203,10 @@ def main():
                         removed_letter = current_word[-1]
                         current_word = current_word[:-1]
                         if current_word.count(removed_letter) == 0:
-                            letter_colors[removed_letter] = GRAY # key goes from white to gray
+                            if removed_letter in wrong_letters:
+                                letter_colors[removed_letter] = BLACK # key goes from white to black if it's already been confirmed incorrect
+                            else:
+                                letter_colors[removed_letter] = GRAY # key goes from white to gray
                         if (box_colors[current_guess_idx][0] == RED) and (len(current_word) < 5):
                             for i in range(5):
                                 box_colors[current_guess_idx][i] = GRAY
